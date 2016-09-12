@@ -6,7 +6,7 @@ PHP by default parses request data only for GET and POST requests and puts them 
 So if you are trying to build a REST API in plain PHP (without a framework) which utilizes other HTTP verbs like PUT or PATCH - it turns out to be a pain. This package attempts to solve that by doing the boring parsing for you and making the request data available for PUT and PATCH as well.
 
 ##How to install?
-`composer require dejan7/restquest`
+`composer require dejan7/restquest:0.1.0`
 
 ##How to use?
 Instantiate the class and call `parse()` method somewhere near the beginning of your app (e.g. during bootstrapping).
