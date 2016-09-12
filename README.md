@@ -48,8 +48,11 @@ RESTQuest enhances this and puts stuff in `$_POST` for additional cases:
  2. **What about files?**
 
  PHP by default uploads and puts files easily accessible in `$_FILES` variable only for POST request, `multipart/form-data` enctype. Currently RESTQuest doesn't add functionality to process files for PUT and PATCH requests, though i'd like to add that in the future. Contributions welcome! You have these options for file uploads:
+ 
  a) Use POST requests whenever you are doing file uploads (PHP populates $_FILES automatically)
+ 
  b) Create a PUT/PATCH endpoint that accepts only files. Read the raw contents of the request with `file_get_contents('php://input');` and save it.
+ 
  c) Use an established framework like Laravel/Symfony
 
 ##Disclaimer
