@@ -6,7 +6,7 @@ PHP by default parses request data only for GET and POST requests and puts them 
 So if you are trying to build a REST API in plain PHP (without a framework) which utilizes other HTTP verbs like PUT or PATCH - it turns out to be a pain. This package attempts to solve that by doing the boring parsing for you and making the request data available for PUT and PATCH as well.
 
 ##How to install?
-`composer require dejan7/restquest`
+`composer require dejan7/restquest:0.1.0`
 
 ##How to use?
 Instantiate the class and call `parse()` method somewhere near the beginning of your app (e.g. during bootstrapping).
@@ -42,8 +42,11 @@ RESTQuest enhances this and puts stuff in `$_POST` for additional cases:
 ##FAQ
 
  1. **Why it parses the request into $_POST always, even for PATCH and PUT?**
-Even though it feels slightly dirty, i feel like it's a better choice than creating new global variables, because you can use a package like [patricklouys/http](https://github.com/PatrickLouys/http) or  [sabre/http](https://github.com/fruux/sabre-http) etc. on top of this one and get other cool features for request/response manipulation without any modifications.
+
+ Even though it feels slightly dirty, i feel like it's a better choice than creating new global variables, because you can use a package like [patricklouys/http](https://github.com/PatrickLouys/http) or  [sabre/http](https://github.com/fruux/sabre-http) etc. on top of this one and get other cool features for request/response manipulation without any modifications.
+
  2. **What about files?**
+
  PHP by default uploads and puts files easily accessible in `$_FILES` variable only for POST request, `multipart/form-data` enctype. Currently RESTQuest doesn't add functionality to process files for PUT and PATCH requests, though i'd like to add that in the future. Contributions welcome! You have these options for file uploads:
  a) Use POST requests whenever you are doing file uploads (PHP populates $_FILES automatically)
  b) Create a PUT/PATCH endpoint that accepts only files. Read the raw contents of the request with `file_get_contents('php://input');` and save it.
