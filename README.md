@@ -1,32 +1,32 @@
 RESTQuest
 ===================
-##The problem:
-PHP by default parses request data only for GET and POST requests and puts them in well-known `$_GET` and `$_POST` variables. Additionally it does so only for `multipart/form-data` and `application/x-www-form-urlencoded` enctypes (Content-type HTTP header).
+RESTQuest is a lightweight PHP polyfill that can parse incoming request body for any HTTP verb.
 
-So if you are trying to build a REST API in plain PHP (without a framework) which utilizes other HTTP verbs like PUT or PATCH - it turns out to be a pain. This package attempts to solve that by doing the boring parsing for you and making the request data available for PUT and PATCH as well.
+##The problem:
+PHP by default parses request data only for GET and POST requests and puts them in well-known `$_GET` and `$_POST` and `$_FILES` variables. Additionally it does so only for `multipart/form-data` and `application/x-www-form-urlencoded` enctypes (Content-type HTTP header).
+
+So if you are trying to build a REST API in plain PHP (without a framework) which utilizes other HTTP verbs like PUT or PATCH - it turns out to be a pain. This package attempts to solve that by doing the boring parsing for you and making the request data available for any type of request as well.
 
 ##How to install?
-`composer require dejan7/restquest:0.1.0`
+`composer require dejan7/restquest:0.2.0`
 
 ##How to use?
-Instantiate the class and call `parse()` method somewhere near the beginning of your app (e.g. during bootstrapping).
+Instantiate the class and call the `decode` method somewhere near the beginning of your app (e.g. during bootstrapping).
 ```
-$RESTquest = new \RESTQuest\RESTQuest();
-$RESTquest->parse();
+$RESTQuest = new \RESTQuest\RESTQuest();
+$RESTQuest->decode($_POST, $_FILES);
 ```
+And that's all, your parsed data will now be in variables that you passed to the `decode` method (`$_POST`, and `$_FILES` in this case).
 
-If the current request method and content type is suppored, you will have your data available in $_POST.
+PHP puts stuff in `$_POST` and `$_FILES` by default for following cases:
 
-##Currently supported cases
-PHP puts the stuff in `$_GET`/ `$_POST ` by default for following cases:
-
- * **GET**: Content-types:
-	 * any
  * **POST** : Content-types:
 	 * `application/x-www-form-urlencoded`
 	 * 	`multipart/form-data`
 
-RESTQuest enhances this and puts stuff in `$_POST` for additional cases:
+
+RESTQuest enhances this and you can configure it to parse data for any method/content-type combination.
+The default options are set to this:
 
 * **POST**: Content-types:
 	* `application/json`
@@ -39,25 +39,48 @@ RESTQuest enhances this and puts stuff in `$_POST` for additional cases:
 	 * 	`multipart/form-data`
 	 * `application/json`
 
-##FAQ
+However, you can change the defaults by passing a `RESTQuestOptions` instance to the constructor like this:
+```
+include __DIR__ . "/../vendor/autoload.php";
 
- 1. **Why it parses the request into $_POST always, even for PATCH and PUT?**
+use RESTQuest\RESTQuestOptions;
+use RESTQuest\Requests;
+use RESTQuest\ContentTypes;
 
- Even though it feels slightly dirty, i feel like it's a better choice than creating new global variables, because you can use a package like [patricklouys/http](https://github.com/PatrickLouys/http) or  [sabre/http](https://github.com/fruux/sabre-http) etc. on top of this one and get other cool features for request/response manipulation without any modifications.
 
- 2. **What about files?**
+$opts = new RESTQuestOptions();
 
- PHP by default uploads and puts files easily accessible in `$_FILES` variable only for POST request, `multipart/form-data` enctype. Currently RESTQuest doesn't add functionality to process files for PUT and PATCH requests, though i'd like to add that in the future. Contributions welcome! You have these options for file uploads:
- 
- a) Use POST requests whenever you are doing file uploads (PHP populates $_FILES automatically)
- 
- b) Create a PUT/PATCH endpoint that accepts only files. Read the raw contents of the request with `file_get_contents('php://input');` and save it.
- 
- c) Use an established framework like Laravel/Symfony
+$opts->forMethod(Requests::GET)
+    ->parse(ContentTypes::X_WWW_FORM_URLENCODED);
 
-##Disclaimer
-This package is in early stages and in active development, it's not ready for production yet.
+$opts->forMethod(Requests::PATCH)
+    ->parse(ContentTypes::FORMDATA)
+    ->parse(ContentTypes::JSON);
 
+$RESTQuest = new \RESTQuest\RESTQuest(
+    $_SERVER,
+    "php://input",
+    $opts
+);
+```
+
+**Wait! Are you telling me that it can parse request body even for GET requests?**
+That's correct. Now whether you will utilize such scenarios - i leave the choice to you. You can read some of the discussions on StackOverflow and decide for yourself
+[http://stackoverflow.com/questions/978061/http-get-with-request-body](http://stackoverflow.com/questions/978061/http-get-with-request-body)
+[http://stackoverflow.com/questions/299628/is-an-entity-body-allowed-for-an-http-delete-request](http://stackoverflow.com/questions/299628/is-an-entity-body-allowed-for-an-http-delete-request)
+
+##Files
+RESTQuest also parses the files from incoming requests and tries it's best to mimic PHP's default behavior with `$_FILES`. However, the only caveat is that you can't use `move_uploaded_file` PHP function on requests other than POST. On other requests `move_uploaded_file` thinks that the file wasn't uploaded with PHP and it doesn't execute. The workaround is to use `copy` like this:
+
+```
+$RESTQuest = new \RESTQuest\RESTQuest();
+$RESTQuest->decode($_POST, $_FILES);
+
+copy($_FILES["myfile"]["tmp_name"], "/some/dir" . $_FILES["myfile"]["name"]);
+```
+
+##Credits
+[Russel](https://github.com/sndsgd) for [sndsgd/http](https://github.com/sndsgd/http), RESTQuest uses his multipart/form-data decoding logic.
 
 ##License
 This is an open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT).

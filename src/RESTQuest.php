@@ -2,132 +2,108 @@
 
 Namespace RESTQuest;
 
-use RESTQuest\Exceptions\MalformedContentTypeHeader;
-
 class RESTQuest
 {
-    const FORMDATA = 'multipart/form-data';
-    const X_WWW_FORM_URLENCODED = 'application/x-www-form-urlencoded';
-    const JSON = 'application/json';
+    /**
+     * @var array - server config array
+     */
+    protected $server;
 
-    private $requestRawBody;
-    private $requestMethod;
-    private $contentType;
-    private $requestParser;
-    private $formDataBoundary;
+    /**
+     * @var string - location of the raw body e.g. php://input
+     */
+    protected $input;
+
+    /**
+     * @var RESTQuestOptions - configuration object
+     */
+    protected $options;
+
+    /**
+     * @var object - active decoder instance
+     */
+    protected $decoder;
+
+    /**
+     * @var array - currently supported decoders
+     */
+    protected $decoders = [
+        ContentTypes::FORMDATA => \RESTQuest\Decoders\FormDataDecoder::class,
+        ContentTypes::JSON => \RESTQuest\Decoders\JSONDecoder::class,
+        ContentTypes::X_WWW_FORM_URLENCODED => \RESTQuest\Decoders\FormUrlEncodedDecoder::class,
+    ];
 
     /**
      * RESTQuest constructor
      *
-     * @param string|null $requestRawBody
-     * @param string|null $requestMethod
-     * @param string|null $contentType
+     * @param null $server
+     * @param null $input
+     * @param RESTQuestOptions|null $options
      */
-    public function __construct($requestRawBody = null, $requestMethod = null, $contentType = null)
+    public function __construct($server = null, $input = null, RESTQuestOptions $options = null)
     {
-        //set content type
-        if (isset($contentType)) {
-            $this->contentType = $contentType;
-        } else {
-            $this->contentType = isset($_SERVER['CONTENT_TYPE']) ? $this->determineContentType() : null;
+        if (!isset($server))
+            $server = $_SERVER;
+
+        if (!isset($input))
+            $input = "php://input";
+
+        if (!isset($options)) {
+            //default options
+            $options = new RESTQuestOptions();
+
+            $options->forMethod(Requests::POST)
+                ->parse(ContentTypes::JSON);
+
+            $options->forMethod(Requests::PUT)
+                ->parse(ContentTypes::FORMDATA)
+                ->parse(ContentTypes::X_WWW_FORM_URLENCODED)
+                ->parse(ContentTypes::JSON);
+
+            $options->forMethod(Requests::PATCH)
+                ->parse(ContentTypes::FORMDATA)
+                ->parse(ContentTypes::X_WWW_FORM_URLENCODED)
+                ->parse(ContentTypes::JSON);
         }
 
-        //set request raw body
-        if (isset($requestRawBody)) {
-            $this->requestRawBody = $requestRawBody;
-        } else {
-            $rawData = fopen("php://input", "r");
-
-            // Read the data 1 KB at a time
-            $this->requestRawBody = '';
-            while ($chunk = fread($rawData, 1024))
-                $this->requestRawBody .= $chunk;
-        }
-
-        //set server method
-        if (isset($requestMethod)) {
-            $this->requestMethod = $requestMethod;
-        } else {
-            $this->requestMethod = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : null;
-        }
-
-        $this->requestParser = new RequestParser($this->requestRawBody);
+        $this->server = $server;
+        $this->input = $input;
+        $this->options = $options;
     }
 
     /**
-     * Retrieves HTTP 'Content-Type' header and parses it when needed
-     * (in multipart/form-data case)
-     *
-     * @return string
-     * @throws MalformedContentTypeHeader
+     * @param $post - decoded body key value pairs will be passed to this variable
+     * @param $files - uploaded files will be passed to this variable
      */
-    private function determineContentType()
+    public function decode(&$post, &$files)
     {
-        if ($_SERVER['CONTENT_TYPE'] == $this::JSON) {
-            return $this::JSON;
-        } else if ($_SERVER['CONTENT_TYPE'] == $this::X_WWW_FORM_URLENCODED) {
-            return $this::X_WWW_FORM_URLENCODED;
-        } else if (strpos($_SERVER['CONTENT_TYPE'], $this::FORMDATA) !== false) {
-            //in this case raw header looks something like this:
-            //Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryabcd1234567
-            //so we have to parse it
-            preg_match('/boundary=(.*)$/', $_SERVER['CONTENT_TYPE'], $matches);
-            if (!isset($matches[1]))
-                throw new MalformedContentTypeHeader();
-
-            $this->formDataBoundary = $matches[1];
-            return $this::FORMDATA;
-        } else {
-            return '';
+        if (!$this->server['CONTENT_TYPE']) {
+            trigger_error("RESTQuest warning: Content Type header not set. Decoding not executed.", E_USER_WARNING);
+            return;
         }
-    }
 
-    /**
-     * Parses the request and populates $_POST for cases covered
-     *
-     * Call this method somewhere at the start of your application (e.g. during bootstrapping)
-     */
-    public function parse()
-    {
-        if ($this->requestMethod == 'GET') {
-            //do nothing, data is available in $_GET automatically
-        } else if ($this->requestMethod == 'POST') {
-            $this->parsePOST();
-        } else if ($this->requestMethod == 'PUT' || $this->requestMethod == 'PATCH') {
-            $this->parsePUTorPATCH();
+        if (!$this->server['REQUEST_METHOD']) {
+            trigger_error("RESTQuest warning: Request Method not set. Decoding not executed.", E_USER_WARNING);
+            return;
         }
-    }
 
-    /**
-     * POST request parsing
-     *
-     * multipart/form-data:               parsed automatically by PHP
-     * application/x-www-form-urlencoded: parsed automatically by PHP
-     * application/json:                  RESTQuest does the parsing
-     */
-    private function parsePOST()
-    {
-        if ($this->contentType == $this::JSON) {
-            $this->requestParser->parseJSON($this->requestRawBody);
-        }
-    }
 
-    /**
-     * PUT/PATCH request parsing
-     *
-     * multipart/form-data:               RESTQuest does the parsing
-     * application/x-www-form-urlencoded: RESTQuest does the parsing
-     * application/json:                  RESTQuest does the parsing
-     */
-    private function parsePUTorPATCH()
-    {
+        $option = $this->options->getOption($this->server['REQUEST_METHOD'], $this->server['CONTENT_TYPE']);
 
-        if ($this->contentType == $this::FORMDATA) {
-            $this->requestParser->parseFormData($this->requestRawBody, $this->formDataBoundary);
-        } else if ($this->contentType == $this::X_WWW_FORM_URLENCODED) {
-            $this->requestParser->parseXWWWFormUrlencoded($this->requestRawBody);
-        } else if ($this->contentType == $this::JSON) {
-            $this->requestParser->parseJSON($this->requestRawBody);
+        if ($option && isset($this->decoders[$option])) {
+            $this->decoder = new $this->decoders[$option](
+                $this->input,
+                $_SERVER['CONTENT_TYPE'],
+                $_SERVER['CONTENT_LENGTH']
+            );
+
+            $data = $this->decoder->decode();
+
+            if ($data['post'])
+                $post = $data['post'];
+
+            if ($data['files'])
+                $files = $data['files'];
         }
     }
 }
