@@ -9,4 +9,4 @@ $RESTQuest = new \RESTQuest\RESTQuest();
 $RESTQuest->decode($_POST, $_FILES);
 
 print_r($_POST);
-print_r($files);
+print_r($_FILES);
