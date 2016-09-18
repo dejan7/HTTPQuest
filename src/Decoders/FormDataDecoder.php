@@ -1,14 +1,14 @@
 <?php
 
-namespace RESTQuest\Decoders;
+namespace HTTPQuest\Decoders;
 
-use RESTQuest\Exceptions\DecodeException;
+use HTTPQuest\Exceptions\DecodeException;
 
 /**
  * multipart/form-data content type decoder
  *
  * Class FormDataDecoder
- * @package RESTQuest\Decoders
+ * @package HTTPQuest\Decoders
  */
 class FormDataDecoder extends Decoder
 {

@@ -1,10 +1,10 @@
 <?php
 
-namespace RESTQuest;
+namespace HTTPQuest;
 
-use RESTQuest\Exceptions\NoActiveMethodException;
+use HTTPQuest\Exceptions\NoActiveMethodException;
 
-class RESTQuestOptions
+class HTTPQuestOptions
 {
     /**
      * array that holds the options

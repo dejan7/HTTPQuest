@@ -1,7 +1,7 @@
 {
-    "name": "dejan7/restquest",
-    "description": "Parses PUT/PATCH data into $_POST",
-    "keywords": ["http", "request", "put", "patch"],
+    "name": "dejan7/httpquest",
+    "description": "PHP polyfill for HTTP request parsing",
+    "keywords": ["http", "request", "put", "patch", "rest"],
     "licence": "MIT",
     "type": "library",
     "authors": [
@@ -18,7 +18,7 @@
     },
     "autoload": {
         "psr-4": {
-            "RESTQuest\\": "src/"
+            "HTTPQuest\\": "src/"
         }
     }
 }

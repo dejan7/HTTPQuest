@@ -1,6 +1,6 @@
 <?php
 
-namespace RESTQuest\Exceptions;
+namespace HTTPQuest\Exceptions;
 
 class NoActiveMethodException extends \Exception
 {

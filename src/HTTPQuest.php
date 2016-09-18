@@ -1,8 +1,8 @@
 <?php
 
-Namespace RESTQuest;
+Namespace HTTPQuest;
 
-class RESTQuest
+class HTTPQuest
 {
     /**
      * @var array - server config array
@@ -15,7 +15,7 @@ class RESTQuest
     protected $input;
 
     /**
-     * @var RESTQuestOptions - configuration object
+     * @var HTTPQuestOptions - configuration object
      */
     protected $options;
 
@@ -28,19 +28,19 @@ class RESTQuest
      * @var array - currently supported decoders
      */
     protected $decoders = [
-        ContentTypes::FORMDATA => \RESTQuest\Decoders\FormDataDecoder::class,
-        ContentTypes::JSON => \RESTQuest\Decoders\JSONDecoder::class,
-        ContentTypes::X_WWW_FORM_URLENCODED => \RESTQuest\Decoders\FormUrlEncodedDecoder::class,
+        ContentTypes::FORMDATA => \HTTPQuest\Decoders\FormDataDecoder::class,
+        ContentTypes::JSON => \HTTPQuest\Decoders\JSONDecoder::class,
+        ContentTypes::X_WWW_FORM_URLENCODED => \HTTPQuest\Decoders\FormUrlEncodedDecoder::class,
     ];
 
     /**
-     * RESTQuest constructor
+     * HTTPQuest constructor
      *
      * @param null $server
      * @param null $input
-     * @param RESTQuestOptions|null $options
+     * @param HTTPQuestOptions|null $options
      */
-    public function __construct($server = null, $input = null, RESTQuestOptions $options = null)
+    public function __construct($server = null, $input = null, HTTPQuestOptions $options = null)
     {
         if (!isset($server))
             $server = $_SERVER;
@@ -50,7 +50,7 @@ class RESTQuest
 
         if (!isset($options)) {
             //default options
-            $options = new RESTQuestOptions();
+            $options = new HTTPQuestOptions();
 
             $options->forMethod(Requests::POST)
                 ->parse(ContentTypes::JSON);
@@ -78,12 +78,12 @@ class RESTQuest
     public function decode(&$post, &$files)
     {
         if (!$this->server['CONTENT_TYPE']) {
-            trigger_error("RESTQuest warning: Content Type header not set. Decoding not executed.", E_USER_WARNING);
+            trigger_error("HTTPQuest warning: Content Type header not set. Decoding not executed.", E_USER_WARNING);
             return;
         }
 
         if (!$this->server['REQUEST_METHOD']) {
-            trigger_error("RESTQuest warning: Request Method not set. Decoding not executed.", E_USER_WARNING);
+            trigger_error("HTTPQuest warning: Request Method not set. Decoding not executed.", E_USER_WARNING);
             return;
         }
 

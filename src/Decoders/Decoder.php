@@ -1,6 +1,6 @@
 <?php
 
-namespace RESTQuest\Decoders;
+namespace HTTPQuest\Decoders;
 
 abstract class Decoder
 {
@@ -27,7 +27,7 @@ abstract class Decoder
     /**
      * An object containing ini settings related to body decoding
      *
-     * @var \RESTQuest\Decoders\DecoderOptions
+     * @var \HTTPQuest\Decoders\DecoderOptions
      */
     protected $options;
 
@@ -49,7 +49,7 @@ abstract class Decoder
      * @param string $path
      * @param string $contentType
      * @param int $contentLength
-     * @param \RESTQuest\Decoders\DecoderOptions|null $options
+     * @param \HTTPQuest\Decoders\DecoderOptions|null $options
      */
     public function __construct(
         $path,

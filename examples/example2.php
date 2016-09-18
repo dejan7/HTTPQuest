@@ -5,12 +5,12 @@
 
 include __DIR__ . "/../vendor/autoload.php";
 
-use RESTQuest\RESTQuestOptions;
-use RESTQuest\Requests;
-use RESTQuest\ContentTypes;
+use HTTPQuest\HTTPQuestOptions;
+use HTTPQuest\Requests;
+use HTTPQuest\ContentTypes;
 
 
-$opts = new RESTQuestOptions();
+$opts = new HTTPQuestOptions();
 
 $opts->forMethod(Requests::GET)
     ->parse(ContentTypes::X_WWW_FORM_URLENCODED);
@@ -19,7 +19,7 @@ $opts->forMethod(Requests::PATCH)
     ->parse(ContentTypes::FORMDATA)
     ->parse(ContentTypes::JSON);
 
-$RESTQuest = new \RESTQuest\RESTQuest(
+$RESTQuest = new \HTTPQuest\HTTPQuest(
     $_SERVER,
     "php://input",
     $opts

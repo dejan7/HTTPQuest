@@ -1,6 +1,6 @@
 <?php
 
-namespace RESTQuest\Decoders;
+namespace HTTPQuest\Decoders;
 
 class JSONDecoder extends Decoder
 {
