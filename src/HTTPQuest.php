@@ -77,16 +77,9 @@ class HTTPQuest
      */
     public function decode(&$post, &$files)
     {
-        if (!$this->server['CONTENT_TYPE']) {
-            trigger_error("HTTPQuest warning: Content Type header not set. Decoding not executed.", E_USER_WARNING);
+        if (!$this->server['CONTENT_TYPE'] || !$this->server['REQUEST_METHOD']) {
             return;
         }
-
-        if (!$this->server['REQUEST_METHOD']) {
-            trigger_error("HTTPQuest warning: Request Method not set. Decoding not executed.", E_USER_WARNING);
-            return;
-        }
-
 
         $option = $this->options->getOption($this->server['REQUEST_METHOD'], $this->server['CONTENT_TYPE']);
 
