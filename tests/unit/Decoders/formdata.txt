@@ -1,0 +1,14 @@
+-----011000010111000001101001
+Content-Disposition: form-data; name="foo1"
+
+bar1
+-----011000010111000001101001
+Content-Disposition: form-data; name="foo2"
+
+bar2
+-----011000010111000001101001
+Content-Disposition: form-data; name="image"; filename="1.jpg"
+Content-Type: image/jpg
+
+asd
+------011000010111000001101001--

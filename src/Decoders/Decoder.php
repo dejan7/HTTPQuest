@@ -2,7 +2,7 @@
 
 namespace HTTPQuest\Decoders;
 
-abstract class Decoder
+class Decoder
 {
     /**
      * The path to the stream to decode
