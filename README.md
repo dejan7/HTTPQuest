@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/dejan7/HTTPQuest.svg?branch=master)](https://travis-ci.org/dejan7/HTTPQuest)
+
 HTTPQuest
 ===================
 HTTPQuest is a lightweight PHP polyfill that can parse incoming request body for any HTTP verb.
