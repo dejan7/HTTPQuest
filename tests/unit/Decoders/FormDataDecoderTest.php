@@ -22,7 +22,8 @@ class FormDataDecoderTest extends \PHPUnit_Framework_TestCase
         ];
 
         $this->assertArrayHasKey('image', $actual['files']);
-        $this->assertEquals('1.jpg', $actual['files']['image']['name']);
+        $this->assertEquals('1.jpg', $actual['files']['image']['name'][0]);
+        $this->assertEquals('2.jpg', $actual['files']['image']['name'][1]);
         $this->assertEquals($expected, $decoder->getValuesAsArray()['post']);
     }
 }

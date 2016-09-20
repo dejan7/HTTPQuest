@@ -43,7 +43,8 @@ class HTTPQuestTest extends \PHPUnit_Framework_TestCase
 
 
         $this->assertArrayHasKey('image', $actualFiles);
-        $this->assertEquals('1.jpg', $actualFiles['image']['name']);
+        $this->assertEquals('1.jpg', $actualFiles['image']['name'][0]);
+        $this->assertEquals('2.jpg', $actualFiles['image']['name'][1]);
         $this->assertEquals($expected, $actualBody);
     }
 

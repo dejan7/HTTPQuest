@@ -98,11 +98,11 @@ class Decoder
                     $parsedFileArray[$name] = $file;
                 }
             }
-            $this->files = $parsedFileArray;
         }
+        
         return [
             'post'  => $this->post,
-            'files' => $this->files
+            'files' => isset($parsedFileArray) ? $parsedFileArray : $this->files
         ];
     }
 }

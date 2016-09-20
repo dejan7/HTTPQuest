@@ -441,8 +441,16 @@ class FormDataDecoder extends Decoder
     {
         foreach ($this->files as $file)
         {
-            if ($file['tmp_name'] !== "" && file_exists($file['tmp_name'])) {
-                unlink($file['tmp_name']);
+            if (isset($file['tmp_name'])) {
+                if ($file['tmp_name'] !== "" && file_exists($file['tmp_name'])) {
+                    unlink($file['tmp_name']);
+                }
+            } else {
+                foreach ($file as $subfile) {
+                    if ($subfile['tmp_name'] !== "" && file_exists($subfile['tmp_name'])) {
+                        unlink($subfile['tmp_name']);
+                    }
+                }
             }
         }
     }
