@@ -2,7 +2,17 @@ language: php
 php:
   - '5.6'
   - '7.0'
+
+install:
+  - composer require satooshi/php-coveralls
+
 before_script:
-  composer install
+  - mkdir -p build/logs
+  - composer install --dev --no-interaction
+
 script:
-  phpunit tests
+  - phpunit --coverage-clover build/logs/clover.xml tests
+
+after_success:
+  - sh -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" ]; then php vendor/bin/coveralls -v; fi;'
+
