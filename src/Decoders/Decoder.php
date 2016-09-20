@@ -99,7 +99,7 @@ class Decoder
                 }
             }
         }
-        
+
         return [
             'post'  => $this->post,
             'files' => isset($parsedFileArray) ? $parsedFileArray : $this->files

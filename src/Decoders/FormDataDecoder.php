@@ -95,6 +95,9 @@ class FormDataDecoder extends Decoder
         $this->boundary = $this->getBoundary();
         $this->lastBoundary = "{$this->boundary}--";
 
+        if (!file_exists($this->path))
+            throw new \RuntimeException("'{$this->path}' doesn't exist");
+
         $this->fp = fopen($this->path, "r");
         if ($this->fp === false) {
             throw new \RuntimeException(
