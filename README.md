@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/dejan7/HTTPQuest.svg?branch=master)](https://travis-ci.org/dejan7/HTTPQuest)
+[![Build Status](https://travis-ci.org/dejan7/HTTPQuest.svg?branch=master)](https://travis-ci.org/dejan7/HTTPQuest) [![Coverage Status](https://coveralls.io/repos/github/dejan7/HTTPQuest/badge.svg?branch=master)](https://coveralls.io/github/dejan7/HTTPQuest?branch=master)
 
 HTTPQuest
 ===================
