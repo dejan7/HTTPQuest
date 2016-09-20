@@ -77,7 +77,7 @@ class HTTPQuest
      */
     public function decode(&$post, &$files)
     {
-        if (!$this->server['CONTENT_TYPE'] || !$this->server['REQUEST_METHOD']) {
+        if (!isset($this->server['CONTENT_TYPE']) || !isset($this->server['REQUEST_METHOD'])) {
             return;
         }
 
@@ -86,8 +86,8 @@ class HTTPQuest
         if ($option && isset($this->decoders[$option])) {
             $this->decoder = new $this->decoders[$option](
                 $this->input,
-                $_SERVER['CONTENT_TYPE'],
-                $_SERVER['CONTENT_LENGTH']
+                $this->server['CONTENT_TYPE'],
+                isset($this->server['CONTENT_LENGTH']) ? $this->server['CONTENT_LENGTH'] : 0
             );
 
             $data = $this->decoder->decode();
